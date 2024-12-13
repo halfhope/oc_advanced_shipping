@@ -4,5 +4,6 @@
 */
 // Text
 $_['text_module_title']       = 'Shipping variants';
+$_['text_replace_free']       = 'Free';
 
 ?>
