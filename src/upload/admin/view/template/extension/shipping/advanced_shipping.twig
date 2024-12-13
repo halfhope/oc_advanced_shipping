@@ -1,0 +1,507 @@
+{{ header }}{{ column_left }} 
+<div id="content">
+<style>
+  .separated-input+.separated-input{
+    margin-top: 5px;
+  }
+</style>
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-advanced" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+        <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+        {% endfor %} 
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+  {% if success %} 
+  <div class="alert alert-success"><i class="fa fa-exclamation-circle"></i> {{ success }} 
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {% endif %} 
+  {% if error_warning %} 
+  <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {% endif %} 
+  <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+      <!--  -->
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-advanced" class="form-horizontal">
+      <div class="form-group required">
+        <label class="col-sm-2 control-label" for="shipping_advanced_shipping_name">{{ entry_name }}</label>
+        <div class="col-sm-10">
+        {% for language in languages %} 
+          <div class="input-group">
+            <span class="input-group-addon">{{ language['html_image'] }}</span>
+            <input type="text" name="shipping_advanced_shipping_name[{{ language['language_id'] }}]" value="{{ shipping_advanced_shipping_name[language['language_id']] }}" placeholder="{{ entry_name }}" id="shipping_advanced_shipping_name" class="form-control" />
+          </div>
+          {% endfor %} 
+        </div>
+      </div>
+
+      <div class="form-group required">
+        <label class="col-sm-2 control-label" for="shipping_advanced_shipping_status">{{ entry_status }}</label>
+        <div class="col-sm-10">
+          <select name="shipping_advanced_shipping_status" class="form-control">
+            {% if (shipping_advanced_shipping_status) %} 
+            <option value="1" selected="selected">{{ text_enabled }}</option>
+            <option value="0">{{ text_disabled }}</option>
+            {% else %} 
+            <option value="1">{{ text_enabled }}</option>
+            <option value="0" selected="selected">{{ text_disabled }}</option>
+            {% endif %} 
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group required">
+        <label class="col-sm-2 control-label" for="shipping_advanced_shipping_sort_order">{{ entry_sort_order }}</label>
+        <div class="col-sm-10">
+          <input type="text" name="shipping_advanced_shipping_sort_order" class="form-control" value="{{ shipping_advanced_shipping_sort_order }}" size="1" />
+        </div>
+      </div>
+      <fieldset class="shipping-variants tabbable tabs-left">
+      <legend>{{ text_shippings }}</legend>
+      <div class="col-xs-2">
+        <ul class="nav nav-tabs tabs-left sideways" id="tabs">
+          {% set shipping_count = 1 %} 
+          {% for value in shipping_advanced_shipping_data %} 
+          <li id="advanced_shipping_{{ shipping_count }}_tab_li"><a href="#advanced_shipping_{{ shipping_count }}_tab" data-toggle="tab">{{ value['name'][current_language_id] }}<i class="fa fa-minus-square pull-right cursor-pointer" onclick="$('#advanced_shipping_{{ shipping_count }}_tab, #advanced_shipping_{{ shipping_count }}_tab_li').remove();$('#tabs a:first').tab('show');return false;"></i></a></li>
+          {% set shipping_count = shipping_count + 1 %} 
+          {% endfor %} 
+          <li><a href="#" id="add_shipping_btn" class="tab-add">{{ text_add_shipping }}&nbsp;<i class="fa fa-plus-square pull-right"></i></a></li>
+        </ul>
+      </div>
+      <div class="col-xs-10">
+        <div class="tab-content" id="shippings">
+
+        {% set shipping_count = 1 %}
+          {% for value in shipping_advanced_shipping_data %} 
+            <div class="tab-pane" id="advanced_shipping_{{ shipping_count }}_tab">
+
+              <ul id="advanced_shipping_{{ shipping_count }}_tabs" class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#tab_{{ shipping_count }}_common">{{ tab_common }}</a></li>
+                <li><a data-toggle="tab" href="#tab_{{ shipping_count }}_price">{{ tab_price }}</a></li>
+                <li><a data-toggle="tab" href="#tab_{{ shipping_count }}_weight">{{ tab_weight }}</a></li>
+                <li><a data-toggle="tab" href="#tab_{{ shipping_count }}_customer">{{ tab_customer }}</a></li>
+              </ul>
+
+              <div class="tab-content">
+                <div id="tab_{{ shipping_count }}_common" class="tab-pane active">
+
+                  <div class="form-group required">
+                    <label class="col-sm-2 control-label" for="shipping_advanced_shipping_sort_order">{{ entry_cost }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][cost]" class="form-control" value="{{ value['cost'] }}" />
+                    </div>
+                  </div>
+
+                  <div class="form-group required">
+                    <label class="col-sm-2 control-label" for="shipping_advanced_shipping_data[{{ shipping_count }}][geo_zone_id]">{{ entry_geo_zone }}</label>
+                    <div class="col-sm-10">
+                      <select name="shipping_advanced_shipping_data[{{ shipping_count }}][geo_zone_id]" class="form-control">
+                        <option value="0">{{ text_all_zones }}</option>
+                        {% for geo_zone in geo_zones %} 
+                        {% if geo_zone.geo_zone_id == value.geo_zone_id %} 
+                        <option value="{{ geo_zone['geo_zone_id'] }}" selected="selected">{{ geo_zone['name'] }}</option>
+                        {% else %} 
+                        <option value="{{ geo_zone['geo_zone_id'] }}">{{ geo_zone['name'] }}</option>
+                        {% endif %} 
+                        {% endfor %} 
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="shipping_advanced_shipping_data[{{ shipping_count }}][tax_class_id]">{{ entry_tax_class }}</label>
+                    <div class="col-sm-10">
+                      <select name="shipping_advanced_shipping_data[{{ shipping_count }}][tax_class_id]" class="form-control">
+                        <option value="0">{{ text_none }}</option>
+                        {% for tax_class in tax_classes %} 
+                        {% if tax_class.tax_class_id == value.tax_class_id %} 
+                        <option value="{{ tax_class['tax_class_id'] }}" selected="selected">{{ tax_class['title'] }}</option>
+                        {% else %} 
+                        <option value="{{ tax_class['tax_class_id'] }}">{{ tax_class['title'] }}</option>
+                        {% endif %} 
+                        {% endfor %} 
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Lang tabs -->
+                  <ul id="lang_{{ shipping_count }}_tabs" class="nav nav-tabs">
+                    {% for key,language in languages %} 
+                      <li class="{{ key == 0 ? 'active' : '' }}"><a data-toggle="tab" href="#mod_{{ shipping_count }}_lang_{{ language['language_id'] }}">{{ language['html_image'] }} {{ language['name'] }}</a></li>
+                    {% endfor %} 
+                  </ul>
+
+                  <div class="tab-content">
+                  {% for key,language in languages %} 
+                    <div id="mod_{{ shipping_count }}_lang_{{ language['language_id'] }}" class="tab-pane {{ key == 0 ? 'active' : '' }}">
+                      <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="shipping_advanced_shipping_sort_order">{{ entry_shipping_name }}</label>
+                        <div class="col-sm-10">
+                          <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][name][{{ language['language_id'] }}]" class="form-control" value="{{ value['name'][language['language_id']] }}" />
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-sm-2 control-label" for="shipping_advanced_shipping_sort_order">{{ entry_description }}</label>
+                        <div class="col-sm-10">
+                          <textarea id="shipping_advanced_shipping_data_{{ shipping_count }}_description_lang_{{ language['language_id'] }}" name="shipping_advanced_shipping_data[{{ shipping_count }}][description][{{ language['language_id'] }}]" class="form-control">{{ value['description'][language['language_id']] }}</textarea>
+                        </div>
+                      </div>
+                    </div> <!-- tab-content -->
+                  {% endfor %} 
+                  </div>
+                  <!-- Lang tabs -->
+
+                </div>
+
+                <div id="tab_{{ shipping_count }}_price" class="tab-pane">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="advanced_shipping_s"><span data-toggle="tooltip" title="{{ entry_price_range_help }}">{{ entry_price_range }}</span></label>
+                    <div class="col-sm-10">
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][price_range][0]" class="form-control separated-input co-sm-6" value="{{ value['price_range'][0] }}" />
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][price_range][1]" class="form-control separated-input co-sm-6" value="{{ value['price_range'][1] }}" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_currency }}</label>
+                    <div class="col-sm-10">
+                      <select name="shipping_advanced_shipping_data[{{ shipping_count }}][currency]" class="form-control">
+                        {% for currency in currencies %} 
+                        {% if (currency['code'] == value['currency']) %} 
+                        <option value="{{ currency['code'] }}" selected="selected">{{ currency['title'] }}</option>
+                        {% else %} 
+                        <option value="{{ currency['code'] }}">{{ currency['title'] }}</option>
+                        {% endif %} 
+                        {% endfor %} 
+                      </select>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div id="tab_{{ shipping_count }}_weight" class="tab-pane">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="advanced_shipping_s"><span data-toggle="tooltip" title="{{ entry_weight_range_help }}">{{ entry_weight_range }}</span></label>
+                    <div class="col-sm-10">
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][weight_range][0]" class="form-control separated-input co-sm-6" value="{{ value['weight_range'][0] }}" />
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][weight_range][1]" class="form-control separated-input co-sm-6" value="{{ value['weight_range'][1] }}" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-weight-class">{{ entry_weight_class }}</label>
+                    <div class="col-sm-10">
+                      <select name="shipping_advanced_shipping_data[{{ shipping_count }}][weight_class_id]" class="form-control">
+                        {% for weight_class in weight_classes %} 
+                        {% if (weight_class['weight_class_id'] == value['weight_class_id']) %} 
+                        <option value="{{ weight_class['weight_class_id'] }}" selected="selected">{{ weight_class['title'] }}</option>
+                        {% else %} 
+                        <option value="{{ weight_class['weight_class_id'] }}">{{ weight_class['title'] }}</option>
+                        {% endif %} 
+                        {% endfor %} 
+                      </select>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div id="tab_{{ shipping_count }}_customer" class="tab-pane">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_customer_group_help }}">{{ entry_customer_group }}</span></label>
+                    <div class="col-sm-10">
+                      <div class="well well-sm" style="height: 150px; overflow: auto;">
+                        {% for customer_group_key,customer_group_data in customer_groups %} 
+                        <div class="checkbox">
+                          <label>
+                            {% if customer_group_data.customer_group_id in value.customer_groups %} 
+                            <input type="checkbox" name="shipping_advanced_shipping_data[{{ shipping_count }}][customer_groups][{{ customer_group_data['customer_group_id'] }}]" id="shipping_advanced_shipping_data[{{ shipping_count }}][customer_groups][{{ customer_group_data['customer_group_id'] }}]" value="{{ customer_group_data['customer_group_id'] }}" checked="checked" />
+                            {{ customer_group_data['name'] }} 
+                            {% else %} 
+                            <input type="checkbox" name="shipping_advanced_shipping_data[{{ shipping_count }}][customer_groups][{{ customer_group_data['customer_group_id'] }}]" id="shipping_advanced_shipping_data[{{ shipping_count }}][customer_groups][{{ customer_group_data['customer_group_id'] }}]" value="{{ customer_group_data['customer_group_id'] }}" />
+                            {{ customer_group_data['name'] }} 
+                            {% endif %} 
+                          </label>
+                        </div>
+                        {% endfor %} 
+                      </div>
+                    <a onclick="$(this).parent().find(':checkbox').prop('checked', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find(':checkbox').prop('checked', false);">{{ text_unselect_all }}</a>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div> <!-- tab-content -->
+
+            </div> <!-- vtabs-content -->
+            {% set shipping_count = shipping_count + 1 %} 
+          {% endfor %} 
+        </div> <!-- shippings -->
+        </div> <!-- shippings -->
+      
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+{% for key,value in shipping_advanced_shipping_data %} 
+{% if (ckeditor) %} 
+  {% for language in languages %} 
+    ckeditorInit('shipping_advanced_shipping_data_{{ key }}_description_lang_{{ language['language_id'] }}');
+  {% endfor %} 
+{% else %} 
+  {% for language in languages %} 
+    $('#shipping_advanced_shipping_data_{{ key }}_description_lang_{{ language['language_id'] }}').summernote({height: 300});
+  {% endfor %} 
+{% endif %} 
+
+{% endfor %} 
+//--></script>
+<script>
+var shipping_count = {{ shipping_count }};
+$(document).ready(function(){
+  {% if shipping_advanced_shipping_data is not empty %}
+  $('#tabs a:first').tab('show');
+  {% endif %}
+  $('#add_shipping_btn').click(function(event){
+    event.preventDefault();
+    addShipping();
+  });
+});
+function addShipping(){
+html = '';
+html += '<div class="tab-pane" id="advanced_shipping_' + shipping_count + '_tab">';
+
+html += '<ul id="advanced_shipping_' + shipping_count + '_tabs" class="nav nav-tabs">';
+html += '<li class="active"><a data-toggle="tab" href="#tab_' + shipping_count + '_common">{{ tab_common }}</a></li>';
+html += '<li><a data-toggle="tab" href="#tab_' + shipping_count + '_price">{{ tab_price }}</a></li>';
+html += '<li><a data-toggle="tab" href="#tab_' + shipping_count + '_weight">{{ tab_weight }}</a></li>';
+html += '<li><a data-toggle="tab" href="#tab_' + shipping_count + '_customer">{{ tab_customer }}</a></li>';
+html += '</ul>';
+
+html += '<div class="tab-content">';
+html += '<div id="tab_' + shipping_count + '_common" class="tab-pane active">';
+
+html += '<div class="form-group required">';
+html += '<label class="col-sm-2 control-label" for="shipping_advanced_shipping_sort_order">{{ entry_cost }}</label>';
+html += '<div class="col-sm-10">';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][cost]" class="form-control" value="1" />';
+html += '</div>';
+html += '</div>';
+
+html += '<div class="form-group required">';
+html += '<label class="col-sm-2 control-label" for="shipping_advanced_shipping_data[' + shipping_count + '][geo_zone_id]">{{ entry_geo_zone }}</label>';
+html += '<div class="col-sm-10">';
+html += '<select name="shipping_advanced_shipping_data[' + shipping_count + '][geo_zone_id]" class="form-control">';
+html += '<option value="0">{{ text_all_zones }}</option>';
+{% for geo_zone in geo_zones %} 
+html += '<option value="{{ geo_zone['geo_zone_id'] }}">{{ geo_zone['name'] }}</option>';
+{% endfor %} 
+html += '</select>';
+html += '</div>';
+html += '</div>';
+
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label" for="shipping_advanced_shipping_data[{{ shipping_count }}][tax_class_id]">{{ entry_tax_class }}</label>';
+html += '<div class="col-sm-10">';
+html += '<select name="shipping_advanced_shipping_data[{{ shipping_count }}][tax_class_id]" class="form-control">';
+html += '<option value="0">{{ text_none }}</option>';
+{% for tax_class in tax_classes %} 
+html += '<option value="{{ tax_class['tax_class_id'] }}">{{ tax_class['title'] }}</option>';
+{% endfor %} 
+html += '</select>';
+html += '</div>';
+html += '</div>';
+
+
+html += '<ul id="lang_' + shipping_count + '_tabs" class="nav nav-tabs">';
+{% for key,language in languages %} 
+html += '<li class="{{ key == 0 ? 'active' : '' }}"><a data-toggle="tab" href="#mod_' + shipping_count + '_lang_{{ language['language_id'] }}">{{ language['html_image'] }} {{ language['name'] }}</a></li>';
+{% endfor %} 
+html += '</ul>';
+
+html += '<div class="tab-content">';
+{% for key,language in languages %} 
+html += '<div id="mod_' + shipping_count + '_lang_{{ language['language_id'] }}" class="tab-pane {{ key == 0 ? 'active' : '' }}">';
+html += '<div class="form-group required">';
+html += '<label class="col-sm-2 control-label" for="shipping_advanced_shipping_sort_order">{{ entry_shipping_name }}</label>';
+html += '<div class="col-sm-10">';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][name][{{ language['language_id'] }}]" class="form-control" value="{{ text_shipping }} ' + shipping_count + '" />';
+html += '</div>';
+html += '</div>';
+
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label" for="shipping_advanced_shipping_sort_order">{{ entry_description }}</label>';
+html += '<div class="col-sm-10">';
+html += '<textarea id="shipping_advanced_shipping_data_' + shipping_count + '_description_lang_{{ language['language_id'] }}" name="shipping_advanced_shipping_data[' + shipping_count + '][description][{{ language['language_id'] }}]" class="form-control"></textarea>';
+html += '</div>';
+html += '</div>';
+html += '</div>';
+  {% endfor %} 
+html += '</div>'; //lang_tab-content
+html += '</div>'; //tab_common
+html += '<div id="tab_' + shipping_count + '_price" class="tab-pane">';
+
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label" for="advanced_shipping_s"><span data-toggle="tooltip" title="{{ entry_price_range_help }}">{{ entry_price_range }}</span></label>';
+html += '<div class="col-sm-10">';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][price_range][0]" class="form-control separated-input co-sm-6" value="0" />';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][price_range][1]" class="form-control separated-input co-sm-6" value="0" />';
+html += '</div>';
+html += '</div>';
+
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label">{{ entry_currency }}</label>';
+html += '<div class="col-sm-10">';
+html += '<select name="shipping_advanced_shipping_data[' + shipping_count + '][currency]" class="form-control">';
+{% for currency in currencies %} 
+html += '<option value="{{ currency['code'] }}">{{ currency['title'] }}</option>';
+{% endfor %} 
+html += '</select>';
+html += '</div>';
+html += '</div>';
+html += '</div>';
+
+html += '<div id="tab_' + shipping_count + '_weight" class="tab-pane">';
+
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label" for="advanced_shipping_s"><span data-toggle="tooltip" title="{{ entry_weight_range_help }}">{{ entry_weight_range }}</span></label>';
+html += '<div class="col-sm-10">';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][weight_range][0]" class="form-control separated-input co-sm-6" value="0" />';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][weight_range][1]" class="form-control separated-input co-sm-6" value="0" />';
+html += '</div>';
+html += '</div>';
+
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label" for="input-weight-class">{{ entry_weight_class }}</label>';
+html += '<div class="col-sm-10">';
+html += '<select name="shipping_advanced_shipping_data[' + shipping_count + '][weight_class_id]" class="form-control">';
+{% for weight_class in weight_classes %} 
+html += '<option value="{{ weight_class['weight_class_id'] }}">{{ weight_class['title'] }}</option>';
+{% endfor %} 
+html += '</select>';
+html += '</div>';
+html += '</div>';
+
+html += '</div>';
+
+html += '<div id="tab_' + shipping_count + '_customer" class="tab-pane">';
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_customer_group_help }}">{{ entry_customer_group }}</span></label>';
+html += '<div class="col-sm-10">';
+html += '<div class="well well-sm" style="height: 150px; overflow: auto;">';
+{% for customer_group_key,customer_group_data in customer_groups %} 
+html += '<div class="checkbox">';
+html += '<label>';
+html += '<input type="checkbox" name="shipping_advanced_shipping_data[' + shipping_count + '][customer_groups][{{ customer_group_data['customer_group_id'] }}]" id="shipping_advanced_shipping_data[' + shipping_count + '][customer_groups][{{ customer_group_data['customer_group_id'] }}]" value="{{ customer_group_data['customer_group_id'] }}" />';
+html += '{{ customer_group_data['name'] }}';
+html += '</label>';
+html += '</div>';
+{% endfor %} 
+html += '</div>';
+html += '<a onclick="$(this).parent().find(\':checkbox\').prop(\'checked\', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find(\':checkbox\').prop(\'checked\', false);">{{ text_unselect_all }}</a>';
+html += '</div>';
+html += '</div>';
+html += '</div>';
+
+html += '</div>';
+
+  $('#shippings').append(html);
+  html = '<li id="advanced_shipping_' + shipping_count + '_tab_li"><a href="#advanced_shipping_' + shipping_count + '_tab" id="advanced_shipping_' + shipping_count + '_tab_btn" data-toggle="tab">{{ text_shipping }} ' + shipping_count + '<i class="fa fa-minus-square pull-right cursor-pointer" onclick="$(\'#advanced_shipping_' + shipping_count + '_tab, #advanced_shipping_' + shipping_count + '_tab_li\').remove();$(\'#tabs a:first\').tab(\'show\');return false;"></i></a></li>';
+
+  {% for language in languages %} 
+    $('#shipping_advanced_shipping_data_'+shipping_count+'_description_lang_{{ language['language_id'] }}').summernote({
+      height: 300
+    });
+  {% endfor %} 
+
+  $('#add_shipping_btn').parents('li').before(html);
+
+  $('#lang_' + shipping_count + '_tabs li:first').tab('show');
+
+  $('#advanced_shipping_' + shipping_count + '_tab_btn').tab('show');
+
+  shipping_count++;
+
+
+  $('[data-toggle="tooltip"]').tooltip();
+}
+</script>
+
+<style>
+.cursor-pointer{
+  cursor: pointer;
+}
+.tabs-left, .tabs-right {
+  border-bottom: none;
+  padding-top: 2px;
+}
+.tabs-left {
+  border-right: 1px solid #ddd;
+}
+.tabs-right {
+  border-left: 1px solid #ddd;
+}
+.tabs-left>li, .tabs-right>li {
+  float: none;
+  margin-bottom: 2px;
+}
+.tabs-left>li {
+  margin-right: -1px;
+}
+.tabs-right>li {
+  margin-left: -1px;
+}
+.tabs-left>li.active>a,
+.tabs-left>li.active>a:hover,
+.tabs-left>li.active>a:focus {
+  border-bottom-color: #ddd;
+  border-right-color: transparent;
+}
+
+.tabs-right>li.active>a,
+.tabs-right>li.active>a:hover,
+.tabs-right>li.active>a:focus {
+  border-bottom: 1px solid #ddd;
+  border-left-color: transparent;
+}
+.tabs-left>li>a {
+  border-radius: 4px 0 0 4px;
+  margin-right: 0;
+  display:block;
+}
+.tabs-right>li>a {
+  border-radius: 0 4px 4px 0;
+  margin-right: 0;
+}
+.tab-add{
+  background: #1e91cf !important;
+  color:#fff !important;
+}
+.tab-add:hover{
+  color:#fff !important;
+  background: #135c83 !important;
+  border-color: #135c83 !important;
+}
+#shippings{
+  min-height: 280px;
+}
+</style>
+{{ footer }}

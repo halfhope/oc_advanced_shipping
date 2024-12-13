@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Advanced Shipping</name>
+    <code>advanced_shipping</code>
+    <version>1.0</version>
+    <author>shtt.blog</author>
+    <link>https://opencartforum.com/files/file/2708-простая-настраиваемая-доставка-с-фикс-стоимос/</link>
+
+    <file path="catalog/view/theme/*/template/checkout/shipping_method.twig">
+        <operation error="log">
+            <search position="replace">
+                <![CDATA[{{ quote.title }} - {{ quote.text }}</label>]]>
+            </search>
+            <add>
+                <![CDATA[{{ quote.title }} - {{ quote.text }}
+    {% if quote.description is not empty %}
+      <br>{{ quote.description }}
+    {% endif %}
+    </label>]]>
+            </add>
+        </operation>
+    </file>
+
+</modification>
