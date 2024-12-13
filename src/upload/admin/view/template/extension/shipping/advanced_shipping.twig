@@ -4,10 +4,26 @@
   .separated-input+.separated-input{
     margin-top: 5px;
   }
+  .pull-right select.form-control{
+    display: inline-block;
+    width: auto;
+    vertical-align: bottom;
+  }
 </style>
   <div class="page-header">
     <div class="container-fluid">
       <div class="pull-right">
+        {% if stores|length > 1 %}
+        <select name="store_id" id="store_id" class="form-control">
+        {% for store_id, store_data in stores %}
+        {% if selected_store_id == store_id %}
+          <option value="{{ store_data.link }}" selected>{{ store_data.name }}</option>
+        {% else %}
+          <option value="{{ store_data.link }}">{{ store_data.name }}</option>
+        {% endif %}
+        {% endfor %}
+        </select>
+        {% endif %}
         <button type="submit" form="form-advanced" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
         <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
       <h1>{{ heading_title }}</h1>
@@ -36,6 +52,7 @@
       <div class="panel-body">
       <!--  -->
       <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-advanced" class="form-horizontal">
+        <input type="hidden" name="selected_store_id" value="{{ selected_store_id }}">
       <div class="form-group required">
         <label class="col-sm-2 control-label" for="shipping_advanced_shipping_name">{{ entry_name }}</label>
         <div class="col-sm-10">
@@ -69,6 +86,29 @@
           <input type="text" name="shipping_advanced_shipping_sort_order" class="form-control" value="{{ shipping_advanced_shipping_sort_order }}" size="1" />
         </div>
       </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_replace_free_help }}">{{ entry_replace_free }}</span></label>
+        <div class="col-sm-10">
+          <label class="radio-inline">
+            {% if shipping_advanced_shipping_replace_free %}
+            <input type="radio" name="shipping_advanced_shipping_replace_free" value="1" checked="checked" />
+            {{ text_yes }}
+            {% else %}
+            <input type="radio" name="shipping_advanced_shipping_replace_free" value="1" />
+            {{ text_yes }}
+            {% endif %}
+          </label>
+          <label class="radio-inline">
+            {% if not shipping_advanced_shipping_replace_free %}
+            <input type="radio" name="shipping_advanced_shipping_replace_free" value="0" checked="checked" />
+            {{ text_no }}
+            {% else %}
+            <input type="radio" name="shipping_advanced_shipping_replace_free" value="0" />
+            {{ text_no }}
+            {% endif %}
+          </label>
+        </div>
+      </div>
       <fieldset class="shipping-variants tabbable tabs-left">
       <legend>{{ text_shippings }}</legend>
       <div class="col-xs-2">
@@ -92,6 +132,7 @@
                 <li class="active"><a data-toggle="tab" href="#tab_{{ shipping_count }}_common">{{ tab_common }}</a></li>
                 <li><a data-toggle="tab" href="#tab_{{ shipping_count }}_price">{{ tab_price }}</a></li>
                 <li><a data-toggle="tab" href="#tab_{{ shipping_count }}_weight">{{ tab_weight }}</a></li>
+		<li><a data-toggle="tab" href="#tab_{{ shipping_count }}_quantity">{{ tab_quantity }}</a></li>
                 <li><a data-toggle="tab" href="#tab_{{ shipping_count }}_customer">{{ tab_customer }}</a></li>
               </ul>
 
@@ -136,6 +177,13 @@
                       </select>
                     </div>
                   </div>
+                  
+                  <div class="form-group required">
+                    <label class="col-sm-2 control-label" for="advanced_shipping_sort_order">{{ entry_sort_order }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][sort_order]" class="form-control" value="{{ value['sort_order'] }}" />
+                    </div>
+                  </div>
 
                   <!-- Lang tabs -->
                   <ul id="lang_{{ shipping_count }}_tabs" class="nav nav-tabs">
@@ -174,6 +222,7 @@
                     <div class="col-sm-10">
                       <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][price_range][0]" class="form-control separated-input co-sm-6" value="{{ value['price_range'][0] }}" />
                       <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][price_range][1]" class="form-control separated-input co-sm-6" value="{{ value['price_range'][1] }}" />
+                      <p class="help-block">{{ entry_price_range_description }}</p>
                     </div>
                   </div>
 
@@ -201,6 +250,7 @@
                     <div class="col-sm-10">
                       <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][weight_range][0]" class="form-control separated-input co-sm-6" value="{{ value['weight_range'][0] }}" />
                       <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][weight_range][1]" class="form-control separated-input co-sm-6" value="{{ value['weight_range'][1] }}" />
+                      <p class="help-block">{{ entry_weight_range_description }}</p>
                     </div>
                   </div>
 
@@ -216,6 +266,19 @@
                         {% endif %} 
                         {% endfor %} 
                       </select>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div id="tab_{{ shipping_count }}_quantity" class="tab-pane">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="advanced_shipping_s"><span data-toggle="tooltip" title="{{ entry_quantity_range_help }}">{{ entry_quantity_range }}</span></label>
+                    <div class="col-sm-10">
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][quantity_range][0]" class="form-control separated-input co-sm-6" value="{{ value['quantity_range'][0] }}" />
+                      <input type="text" name="shipping_advanced_shipping_data[{{ shipping_count }}][quantity_range][1]" class="form-control separated-input co-sm-6" value="{{ value['quantity_range'][1] }}" />
+                      <p class="help-block">{{ entry_quantity_range_description }}</p>
                     </div>
                   </div>
 
@@ -277,6 +340,10 @@
 <script>
 var shipping_count = {{ shipping_count }};
 $(document).ready(function(){
+  $('#store_id').on('change', function(event) {
+    event.preventDefault();
+    window.location = $(this).val();
+  });
   {% if shipping_advanced_shipping_data is not empty %}
   $('#tabs a:first').tab('show');
   {% endif %}
@@ -293,6 +360,7 @@ html += '<ul id="advanced_shipping_' + shipping_count + '_tabs" class="nav nav-t
 html += '<li class="active"><a data-toggle="tab" href="#tab_' + shipping_count + '_common">{{ tab_common }}</a></li>';
 html += '<li><a data-toggle="tab" href="#tab_' + shipping_count + '_price">{{ tab_price }}</a></li>';
 html += '<li><a data-toggle="tab" href="#tab_' + shipping_count + '_weight">{{ tab_weight }}</a></li>';
+html += '<li><a data-toggle="tab" href="#tab_' + shipping_count + '_quantity">{{ tab_quantity }}</a></li>';
 html += '<li><a data-toggle="tab" href="#tab_' + shipping_count + '_customer">{{ tab_customer }}</a></li>';
 html += '</ul>';
 
@@ -330,6 +398,12 @@ html += '</select>';
 html += '</div>';
 html += '</div>';
 
+html += '<div class="form-group required">';
+html += '<label class="col-sm-2 control-label" for="advanced_shipping_sort_order">{{ entry_sort_order }}</label>';
+html += '<div class="col-sm-10">';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][sort_order]" class="form-control" value="1" />';
+html += '</div>';
+html += '</div>';
 
 html += '<ul id="lang_' + shipping_count + '_tabs" class="nav nav-tabs">';
 {% for key,language in languages %} 
@@ -397,6 +471,18 @@ html += '<select name="shipping_advanced_shipping_data[' + shipping_count + '][w
 html += '<option value="{{ weight_class['weight_class_id'] }}">{{ weight_class['title'] }}</option>';
 {% endfor %} 
 html += '</select>';
+html += '</div>';
+html += '</div>';
+
+html += '</div>';
+
+html += '<div id="tab_' + shipping_count + '_quantity" class="tab-pane">';
+
+html += '<div class="form-group">';
+html += '<label class="col-sm-2 control-label" for="advanced_shipping_s"><span data-toggle="tooltip" title="{{ entry_quantity_range_help }}">{{ entry_quantity_range }}</span></label>';
+html += '<div class="col-sm-10">';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][quantity_range][0]" class="form-control separated-input co-sm-6" value="0" />';
+html += '<input type="text" name="shipping_advanced_shipping_data[' + shipping_count + '][quantity_range][1]" class="form-control separated-input co-sm-6" value="0" />';
 html += '</div>';
 html += '</div>';
 

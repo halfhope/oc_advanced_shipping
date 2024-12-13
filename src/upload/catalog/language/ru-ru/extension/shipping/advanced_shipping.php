@@ -4,5 +4,6 @@
 */
 // Text
 $_['text_module_title']       = 'Варианты доставки';
+$_['text_replace_free']       = 'Бесплатно';
 
 ?>
