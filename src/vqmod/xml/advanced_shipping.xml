@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<id>Advanced Shipping</id>
+	<version>1.0</version>
+	<vqmver></vqmver>
+	<author>Shashakhmetov Talgat [talgatks@gmail.com]</author>
+	<file name="catalog/view/theme/default/template/checkout/shipping_method.tpl">
+		<operation error="log">
+			<search position="replace"><![CDATA[<label for="<?php echo $quote['code']; ?>"><?php echo $quote['title']; ?></label>]]></search>
+			<add><![CDATA[<label for="<?php echo $quote['code']; ?>"><?php echo $quote['title']; ?><?php echo isset($quote['description']) ? "<br/>".$quote['description'] : ""; ?></label>]]></add>
+		</operation>
+	</file>
+</modification>
