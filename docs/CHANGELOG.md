@@ -11,3 +11,7 @@
 * feature: Added sorting order
 * feature: Added a condition - quantity of products in the cart
 
+#### 1.2.0.1
+
+* fix: Fixed inactive by default tab
+
