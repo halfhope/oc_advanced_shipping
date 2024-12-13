@@ -136,7 +136,7 @@ class ControllerShippingAdvancedShipping extends Controller
         $this->load->model('localisation/weight_class');
         $this->load->model('sale/customer_group');
         
-        $this->data['languages'] = $this->model_localisation_language->getLanguages();
+        $this->data['languages'] = array_values($this->model_localisation_language->getLanguages());
         
         $this->data['current_language_id'] = $this->config->get('config_language_id');
         
