@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Advanced Shipping</name>
+    <code>advanced_shipping</code>
+    <version>1.0</version>
+    <author>shtt.blog</author>
+    <link>https://opencartforum.com/files/file/2708-простая-настраиваемая-доставка-с-фикс-стоимос/</link>
+
+    <file path="catalog/view/theme/*/template/checkout/shipping_method.tpl">
+        <operation error="log">
+            <search position="replace">
+                <![CDATA[<?php echo $quote['title']; ?> - <?php echo $quote['text']; ?></label>]]>
+            </search>
+            <add>
+                <![CDATA[<?php echo $quote['title']; ?> - <?php echo $quote['text']; ?>
+    <?php if (isset($quote['description']) && !empty($quote['description'])): ?>
+      <br><?php echo $quote['description']; ?>
+    <?php endif ?>
+    </label>]]>
+            </add>
+        </operation>
+    </file>
+
+</modification>
