@@ -20,10 +20,23 @@
   <div class="box">
     <div class="heading">
       <h1><img src="view/image/shipping.png" alt="" /> <?php echo $heading_title; ?></h1>
-      <div class="buttons"><a onclick="$('#form').submit();" class="button"><?php echo $button_save; ?></a><a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a></div>
+      <div class="buttons">
+        <?php if (count($stores) > 1): ?>
+        <select name="store_id" id="store_id" style="width:160px;">
+        <?php foreach ($stores as $store_id => $store_data): ?>
+          <?php if ($selected_store_id == $store_id): ?>
+          <option value="<?php echo $store_data['link'] ?>" selected><?php echo $store_data['name'] ?></option>
+          <?php else: ?>
+          <option value="<?php echo $store_data['link'] ?>"><?php echo $store_data['name'] ?></option>
+          <?php endif ?>
+        <?php endforeach ?>
+        </select>
+        <?php endif ?>
+        <a onclick="$('#form').submit();" class="button"><?php echo $button_save; ?></a><a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a></div>
     </div>
     <div class="content">
       <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
+        <input type="hidden" name="selected_store_id" value="<?php echo $selected_store_id ?>">
         <table class="form">
           <tr>
             <td><?php echo $entry_name; ?></td>
@@ -49,6 +62,20 @@
             <td><?php echo $entry_sort_order; ?></td>
             <td><input type="text" name="advanced_shipping_sort_order" value="<?php echo $advanced_shipping_sort_order; ?>" size="1" /></td>
           </tr>
+          <tr>
+            <td><?php echo $entry_replace_free; ?> <span class="help"><?php echo $entry_replace_free_help ?></span></td>
+            <td><?php if ($advanced_shipping_replace_free) { ?>
+                <input type="radio" name="advanced_shipping_replace_free" value="1" checked="checked" />
+                <?php echo $text_yes; ?>
+                <input type="radio" name="advanced_shipping_replace_free" value="0" />
+                <?php echo $text_no; ?>
+                <?php } else { ?>
+                <input type="radio" name="advanced_shipping_replace_free" value="1" />
+                <?php echo $text_yes; ?>
+                <input type="radio" name="advanced_shipping_replace_free" value="0" checked="checked" />
+                <?php echo $text_no; ?>
+                <?php } ?></td>
+          </tr>
         </table>
         <h2><?php echo $text_shippings ?></h2>
         <div id="tabs" class="vtabs">
@@ -67,6 +94,7 @@
                 <a class="tab_btn" id="link_tab_<?php echo $shipping_count ?>_common" href="#tab_<?php echo $shipping_count ?>_common"><?php echo $tab_common ?></a>
                 <a class="tab_btn" id="link_tab_<?php echo $shipping_count ?>_price" href="#tab_<?php echo $shipping_count ?>_price"><?php echo $tab_price ?></a>
                 <a class="tab_btn" id="link_tab_<?php echo $shipping_count ?>_weight" href="#tab_<?php echo $shipping_count ?>_weight"><?php echo $tab_weight ?></a>
+                <a class="tab_btn" id="link_tab_<?php echo $shipping_count ?>_quantity" href="#tab_<?php echo $shipping_count ?>_quantity"><?php echo $tab_quantity ?></a>
                 <a class="tab_btn" id="link_tab_<?php echo $shipping_count ?>_customer" href="#tab_<?php echo $shipping_count ?>_customer"><?php echo $tab_customer ?> </a>
               </div>
 
@@ -104,6 +132,12 @@
                           <?php } ?>
                         </select></td>
                   </tr>
+                  <tr>
+                    <td><?php echo $entry_sort_order; ?></td>
+                    <td>
+                      <input type="text" name="advanced_shipping_data[<?php echo $shipping_count ?>][sort_order]" value="<?php echo $value['sort_order'] ?>">
+                    </td>
+                  </tr>
                 </table>
                 <div id="lang_<?php echo $shipping_count ?>_tabs" class="htabs lang_tabs">
                   <?php foreach ($languages as $language): ?>
@@ -135,6 +169,8 @@
                     <td>
                       <input type="text" name="advanced_shipping_data[<?php echo $shipping_count ?>][price_range][0]" class="form-control separated-input co-sm-6" value="<?php echo $value['price_range'][0] ?>" />
                       <input type="text" name="advanced_shipping_data[<?php echo $shipping_count ?>][price_range][1]" class="form-control separated-input co-sm-6" value="<?php echo $value['price_range'][1] ?>" />
+                      <br><span class="help"><?php echo $entry_price_range_description ?></span>
+
                     </td>
                   </tr>
                   <tr>
@@ -159,6 +195,7 @@
                     <td>
                       <input type="text" name="advanced_shipping_data[<?php echo $shipping_count ?>][weight_range][0]" class="form-control separated-input co-sm-6" value="<?php echo $value['weight_range'][0] ?>" />
                       <input type="text" name="advanced_shipping_data[<?php echo $shipping_count ?>][weight_range][1]" class="form-control separated-input co-sm-6" value="<?php echo $value['weight_range'][1] ?>" />
+                      <br><span class="help"><?php echo $entry_weight_range_description ?></span>
                     </td>
                   </tr>
                   <tr>
@@ -172,6 +209,19 @@
                           <?php } ?>
                           <?php } ?>
                         </select></td>
+                  </tr>
+                </table>
+              </div>
+
+              <div id="tab_<?php echo $shipping_count ?>_quantity" class="htabs-content">
+                <table class="form">
+                  <tr>
+                    <td><?php echo $entry_quantity_range ?> <span class="help"><?php echo $entry_quantity_range_help ?></span></td>
+                    <td>
+                      <input type="text" name="advanced_shipping_data[<?php echo $shipping_count ?>][quantity_range][0]" class="form-control separated-input co-sm-6" value="<?php echo $value['quantity_range'][0] ?>" />
+                      <input type="text" name="advanced_shipping_data[<?php echo $shipping_count ?>][quantity_range][1]" class="form-control separated-input co-sm-6" value="<?php echo $value['quantity_range'][1] ?>" />
+                      <br><span class="help"><?php echo $entry_quantity_range_description ?></span>
+                    </td>
                   </tr>
                 </table>
               </div>
@@ -242,6 +292,10 @@ $(document).ready(function(){
     event.preventDefault();
     addShipping();
   });
+  $('#store_id').on('change', function(event) {
+    event.preventDefault();
+    window.location = $(this).val();
+  });
 });
 function addShipping(){
 html = '';
@@ -250,6 +304,7 @@ html += '  <div id="tabs' + shipping_count + '" class="htabs">';
 html += '    <a class="tab_btn" id="link_tab_' + shipping_count + '_common" href="#tab_' + shipping_count + '_common"><?php echo $tab_common ?></a>';
 html += '    <a class="tab_btn" id="link_tab_' + shipping_count + '_price" href="#tab_' + shipping_count + '_price"><?php echo $tab_price ?></a>';
 html += '    <a class="tab_btn" id="link_tab_' + shipping_count + '_weight" href="#tab_' + shipping_count + '_weight"><?php echo $tab_weight ?></a>';
+html += '    <a class="tab_btn" id="link_tab_' + shipping_count + '_quantity" href="#tab_' + shipping_count + '_quantity"><?php echo $tab_quantity ?></a>';
 html += '    <a class="tab_btn" id="link_tab_' + shipping_count + '_customer" href="#tab_' + shipping_count + '_customer"><?php echo $tab_customer ?> </a>';
 html += '  </div>';
 
@@ -278,6 +333,12 @@ html += '              <option value="0"><?php echo $text_none; ?></option>';
 html += '              <option value="<?php echo $tax_class['tax_class_id']; ?>"><?php echo $tax_class['title']; ?></option>';
 <?php } ?>
 html += '            </select></td>';
+html += '      </tr>';
+html += '      <tr>';
+html += '        <td><?php echo $entry_sort_order ?> </td>';
+html += '        <td>';
+html += '          <input type="text" name="advanced_shipping_data[' + shipping_count + '][sort_order]" value="0">';
+html += '        </td>';
 html += '      </tr>';
 html += '    </table>';
 html += '    <div id="lang_' + shipping_count + '_tabs" class="htabs lang_tabs">';
@@ -310,6 +371,7 @@ html += '        <td><?php echo $entry_price_range ?> <span class="help"><?php e
 html += '        <td>';
 html += '          <input type="text" name="advanced_shipping_data[' + shipping_count + '][price_range][0]" class="form-control separated-input co-sm-6" value="0" />';
 html += '          <input type="text" name="advanced_shipping_data[' + shipping_count + '][price_range][1]" class="form-control separated-input co-sm-6" value="0" />';
+html += '        <br /><span class="help"><?php echo $entry_price_range_description ?></span>';
 html += '        </td>';
 html += '      </tr>';
 html += '      <tr>';
@@ -330,6 +392,7 @@ html += '        <td><?php echo $entry_weight_range ?> <span class="help"><?php 
 html += '        <td>';
 html += '          <input type="text" name="advanced_shipping_data[' + shipping_count + '][weight_range][0]" class="form-control separated-input co-sm-6" value="0" />';
 html += '          <input type="text" name="advanced_shipping_data[' + shipping_count + '][weight_range][1]" class="form-control separated-input co-sm-6" value="0" />';
+html += '        <br /><span class="help"><?php echo $entry_weight_range_description ?></span>';
 html += '        </td>';
 html += '      </tr>';
 html += '      <tr>';
@@ -339,6 +402,19 @@ html += '        <td><select name="advanced_shipping_data[' + shipping_count + '
 html += '              <option value="<?php echo $weight_class['weight_class_id']; ?>"><?php echo $weight_class['title']; ?></option>';
 <?php } ?>
 html += '            </select></td>';
+html += '      </tr>';
+html += '    </table>';
+html += '  </div>';
+html += '';
+html += '  <div id="tab_' + shipping_count + '_quantity" class="htabs-content">';
+html += '    <table class="form">';
+html += '      <tr>';
+html += '        <td><?php echo $entry_quantity_range ?> <span class="help"><?php echo $entry_quantity_range_help ?></span></td>';
+html += '        <td>';
+html += '          <input type="text" name="advanced_shipping_data[' + shipping_count + '][quantity_range][0]" class="form-control separated-input co-sm-6" value="0" />';
+html += '          <input type="text" name="advanced_shipping_data[' + shipping_count + '][quantity_range][1]" class="form-control separated-input co-sm-6" value="0" />';
+html += '        <br /><span class="help"><?php echo $entry_quantity_range_description ?></span>';
+html += '        </td>';
 html += '      </tr>';
 html += '    </table>';
 html += '  </div>';
